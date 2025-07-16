@@ -52,9 +52,7 @@ def jugar_truco():
     carta_jugada_maquina = None
     mostrando_resultado = False
     resultado_texto = ""
-    animacion_frame = 0
-    animacion_max_frames = 60
-    mazo_anim = []
+
 
     def iniciar_mano():
         """
