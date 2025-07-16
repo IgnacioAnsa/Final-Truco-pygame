@@ -3,27 +3,38 @@ import random
 import sys
 
 def jugar_truco():
+    """
+    Función principal que ejecuta el juego de Truco con interfaz gráfica usando Pygame.
+    Maneja los distintos estados del juego: menú, ingreso de nombre, selección de puntos,
+    animación de reparto, juego, ranking y final.
+    """
     pygame.init()
 
+    # Dimensiones y ventana
     ANCHO, ALTO = 1000, 600
     VENTANA = pygame.display.set_mode((ANCHO, ALTO))
     pygame.display.set_caption("Truco")
 
+    # Colores y fuente
     VERDE_MESA = (0, 100, 0)
     BLANCO = (255, 255, 255)
     ROJO = (255, 50, 50)
     fuente = pygame.font.SysFont("Comic Sans", 30)
 
+    # Posiciones de cartas
     posiciones_jugador = [(200 + i * 100, ALTO - 150) for i in range(3)]
     posiciones_maquina = [(200 + i * 100, 50) for i in range(3)]
     zona_jugada_jugador = (ANCHO // 2 - 40, ALTO // 2 + 60)
     zona_jugada_maquina = (ANCHO // 2 - 40, ALTO // 2 - 180)
-
+    
+    # Imagen del reverso de las cartas
     reverso = pygame.image.load("assets/cartas/dorso_carta.jpg")
     reverso = pygame.transform.scale(reverso, (80, 120))
-
+    
+    # Reloj de control de FPS
     reloj = pygame.time.Clock()
 
+    # Variables de estado del juego
     estado = "menu"
     input_text = ""
     nombre_jugador = ""
@@ -46,6 +57,10 @@ def jugar_truco():
     mazo_anim = []
 
     def iniciar_mano():
+        """
+        Inicializa una nueva mano del Truco, repartiendo cartas a ambos jugadores
+        y actualizando las variables necesarias.
+        """
         nonlocal mano_jugador, mano_maquina, imagenes_mano, rects_cartas, puntos_mano, ronda
         puntos_mano[:] = [0, 0]
         ronda = 1
@@ -58,7 +73,8 @@ def jugar_truco():
         for i, img in enumerate(imagenes_mano):
             rect = img.get_rect(topleft=posiciones_jugador[i])
             rects_cartas.append(rect)
-
+    
+    # Bucle principal del juego
     while True:
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
@@ -76,7 +92,8 @@ def jugar_truco():
                     else:
                         if len(input_text) < 20:
                             input_text += evento.unicode
-
+            
+            # Lógica de los distintos estados
             elif evento.type == pygame.MOUSEBUTTONDOWN:
                 x, y = evento.pos
                 if estado == "menu":
@@ -94,6 +111,7 @@ def jugar_truco():
                                 sys.exit()
 
                 elif estado == "seleccion_puntos":
+                    # Selección de objetivo de puntos
                     if ANCHO // 2 - 100 <= x <= ANCHO // 2 + 100:
                         if ALTO // 2 <= y <= ALTO // 2 + 50:
                             puntos_objetivo = 15
@@ -106,16 +124,19 @@ def jugar_truco():
                         mazo_anim = generar_mazo()
 
                 elif estado == "ranking":
+                    # Ranking historico
                     rect_menu = fuente.render("Menú", True, BLANCO).get_rect(topright=(ANCHO - 20, 20))
                     if rect_menu.collidepoint(x, y):
                         estado = "menu"
 
                 elif estado == "juego":
+                    # Menú dentro del juego
                     rect_menu = fuente.render("Menú", True, BLANCO).get_rect(topright=(ANCHO - 20, 20))
                     if rect_menu.collidepoint(x, y):
                         estado = "menu"
                         continue
-
+                    
+                    # Resultado de la ronda
                     if mostrando_resultado:
                         mostrando_resultado = False
                         carta_jugada_jugador = None
@@ -137,6 +158,7 @@ def jugar_truco():
                                     continue
                             iniciar_mano()
                     else:
+                        # Detectar clic en carta
                         for i, rect in enumerate(rects_cartas):
                             if rect.collidepoint(x, y):
                                 if carta_jugada_jugador is None:
