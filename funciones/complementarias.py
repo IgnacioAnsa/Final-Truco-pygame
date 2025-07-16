@@ -1,5 +1,7 @@
 import csv
 import os
+import pygame
+import random
 
 archivo_puntajes = "./archivo/registro.csv"
 
@@ -11,6 +13,7 @@ def leer_puntajes() -> dict:
         # Saltar cabecera
         next(lector, None)
         return {fila[0]: int(fila[1]) for fila in lector if fila}
+    
 
 def guardar_puntajes(historico: dict) -> None:
     with open(archivo_puntajes, mode="w", newline="", encoding="utf-8") as archivo:
@@ -29,3 +32,19 @@ def registrar_puntaje(nombre: str, puntos: int) -> None:
     else:
         historico[nombre] = puntos
     guardar_puntajes(historico)
+
+def cargar_carta(nombre):
+    ruta = f"assets/cartas/{nombre}.jpg"
+    imagen = pygame.image.load(ruta)
+    return pygame.transform.scale(imagen, (80, 120))
+
+
+def generar_mazo() -> list:
+    palos = ["basto", "espada", "oro", "copa"]
+    valores = ["1", "2", "3", "4", "5", "6", "7", "10", "11", "12"]
+    return [f"{valor} de {palo}" for palo in palos for valor in valores]
+
+
+def repartir_cartas(mazo: list) -> list:
+    random.shuffle(mazo)
+    return [mazo[:3], mazo[3:6]]
